@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Admiral Easter Invitational</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .hero {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .hero img {
+            width: 100%;
+            display: block;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #222;
+            border-bottom: 3px solid #4CAF50;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs button {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 8px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -3px;
+        }
+
+        .nav-tabs button.active {
+            color: #fff;
+            border-bottom-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .nav-tabs button:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .refresh-bar {
+            background: #222;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #333;
+        }
+
+        .refresh-bar .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Leaderboard Table */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table thead th {
+            background: #2d2d2d;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4CAF50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .leaderboard-table tbody tr {
+            border-bottom: 1px solid #333;
+            transition: background 0.2s;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .leaderboard-table tbody tr.leader {
+            background: rgba(76, 175, 80, 0.12);
+        }
+
+        .leaderboard-table td {
+            padding: 12px 8px;
+            font-size: 14px;
+        }
+
+        .rank-cell {
+            font-weight: 700;
+            font-size: 16px;
+            text-align: center;
+            min-width: 36px;
+        }
+
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+
+        .team-cell {
+            line-height: 1.4;
+        }
+
+        .team-cell .player-a {
+            font-weight: 600;
+        }
+
+        .team-cell .player-b {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .score-cell {
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .vs-par-cell {
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .vs-par-under { color: #4CAF50; }
+        .vs-par-over { color: #ff6b6b; }
+        .vs-par-even { color: #aaa; }
+
+        .hcp-cell {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* Teams Table */
+        .teams-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .teams-table thead th {
+            background: #2d2d2d;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .teams-table td {
+            padding: 10px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+        }
+
+        /* Players Table */
+        .players-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .players-table thead th {
+            background: #2d2d2d;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .players-table td {
+            padding: 10px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: #222;
+            padding: 20px 16px;
+            margin: 0;
+        }
+
+        .info-section h3 {
+            color: #4CAF50;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .info-item {
+            background: #2d2d2d;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .info-item .label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item .value {
+            color: #fff;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Buffet Banner */
+        .buffet-banner {
+            width: 100%;
+            overflow: hidden;
+            border-top: 3px solid #4CAF50;
+        }
+
+        .buffet-banner img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            background: #222;
+            padding: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #333;
+        }
+
+        .footer img {
+            height: 40px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .loading .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top-color: #4CAF50;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* No scores message */
+        .no-scores {
+            text-align: center;
+            padding: 30px 16px;
+            color: #888;
+            font-size: 15px;
+        }
+
+        .no-scores .emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 480px) {
+            .leaderboard-table td, .leaderboard-table th {
+                padding: 10px 6px;
+                font-size: 13px;
+            }
+            .score-cell, .vs-par-cell { font-size: 14px; }
+            .rank-cell { font-size: 14px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Banner -->
+    <div class="hero">
+        <img src="https://lh3.googleusercontent.com/d/1hwkNvlFAnFzKnmEAmxc8zwKWsLB1mShk" alt="The Admiral Easter Invitational - El Camaleón Mayakoba - April 4, 2026">
+    </div>
+
+    <!-- Tournament Info (pulled from Details sheet) -->
+    <div class="info-section">
+        <h3>Tournament Details</h3>
+        <div class="info-grid" id="details-grid">
+            <div class="info-item"><div class="label">Loading...</div><div class="value">-</div></div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="active" onclick="showTab('leaderboard')">Leaderboard</button>
+        <button onclick="showTab('teams')">Teams</button>
+        <button onclick="showTab('players')">Players</button>
+    </div>
+
+    <!-- Live refresh bar -->
+    <div class="refresh-bar">
+        <span><span class="live-dot"></span> LIVE</span>
+        <span id="lastUpdate">Updating...</span>
+    </div>
+
+    <!-- Leaderboard Tab -->
+    <div id="tab-leaderboard" class="tab-content active">
+        <div class="loading" id="leaderboard-loading">
+            <div class="spinner"></div>
+            <div>Loading leaderboard...</div>
+        </div>
+        <table class="leaderboard-table" id="leaderboard-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th style="text-align:center">#</th>
+                    <th>Team</th>
+                    <th style="text-align:center">Hcp</th>
+                    <th style="text-align:center">Gross</th>
+                    <th style="text-align:center">Net</th>
+                    <th style="text-align:center">vs Par</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Teams Tab -->
+    <div id="tab-teams" class="tab-content">
+        <div class="loading" id="teams-loading">
+            <div class="spinner"></div>
+            <div>Loading teams...</div>
+        </div>
+        <table class="teams-table" id="teams-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th style="text-align:center">#</th>
+                    <th>Player A</th>
+                    <th>Player B</th>
+                    <th style="text-align:center">Low</th>
+                    <th style="text-align:center">High</th>
+                    <th style="text-align:center">Team</th>
+                </tr>
+            </thead>
+            <tbody id="teams-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Players Tab -->
+    <div id="tab-players" class="tab-content">
+        <div class="loading" id="players-loading">
+            <div class="spinner"></div>
+            <div>Loading players...</div>
+        </div>
+        <table class="players-table" id="players-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th style="text-align:center">#</th>
+                    <th>Player</th>
+                    <th style="text-align:center">Team</th>
+                    <th style="text-align:center">Hcp</th>
+                </tr>
+            </thead>
+            <tbody id="players-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Buffet Banner -->
+    <div class="buffet-banner">
+        <img src="https://lh3.googleusercontent.com/d/1YATQxxmm-pCw8fBMEp0zGVmPsDA-Bv4M" alt="Buffet Luncheon">
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>The Admiral Easter Invitational 2026</div>
+        <div style="margin-top:4px;">El Camaleón at Mayakoba</div>
+    </div>
+
+<script>
+    const API_KEY = 'AIzaSyASHDg6hHcEX7stzCG6IyC3IfUl20v7IFU';
+    const SHEET_ID = '1kM2RLB_gEbbARUsajtyI7tCgVbE-PxPfxkyBo0oCwq8';
+    const REFRESH_INTERVAL = 20000; // 20 seconds
+
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function formatVsPar(val) {
+        if (!val || val === '') return { text: '-', className: 'vs-par-even' };
+        const num = parseInt(val);
+        if (isNaN(num)) return { text: val, className: 'vs-par-even' };
+        if (num < 0) return { text: val, className: 'vs-par-under' };
+        if (num > 0) return { text: '+' + num, className: 'vs-par-over' };
+        return { text: 'E', className: 'vs-par-even' };
+    }
+
+    function getRankClass(rank) {
+        if (rank === '1' || rank === 1) return 'rank-1';
+        if (rank === '2' || rank === 2) return 'rank-2';
+        if (rank === '3' || rank === 3) return 'rank-3';
+        return '';
+    }
+
+    async function fetchData() {
+        try {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?ranges=Players&ranges=Teams&ranges=Leader%20Board&ranges=Details&key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.error) {
+                console.error('API Error:', data.error);
+                return;
+            }
+
+            const playersData = data.valueRanges[0].values || [];
+            const teamsData = data.valueRanges[1].values || [];
+            const leaderData = data.valueRanges[2].values || [];
+            const detailsData = data.valueRanges[3].values || [];
+
+            renderDetails(detailsData);
+            renderLeaderboard(leaderData);
+            renderTeams(teamsData);
+            renderPlayers(playersData);
+
+            document.getElementById('lastUpdate').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+        } catch (err) {
+            console.error('Fetch error:', err);
+            document.getElementById('lastUpdate').textContent = 'Update failed - retrying...';
+        }
+    }
+
+    function renderDetails(data) {
+        const grid = document.getElementById('details-grid');
+        let html = '';
+        data.forEach(row => {
+            if (row[0] && row[0].trim()) {
+                html += `<div class="info-item">
+                    <div class="label">${row[0].trim()}</div>
+                    <div class="value">${(row[1] || '').trim()}</div>
+                </div>`;
+            }
+        });
+        if (html) grid.innerHTML = html;
+    }
+
+    function renderLeaderboard(data) {
+        // Header row is at index 4, data starts at index 5
+        const rows = data.slice(5).filter(r => r.length > 1 && r[1] && r[1].trim());
+
+        // Sort by rank if available, otherwise by net score
+        const hasScores = rows.some(r => r[4] && r[4].trim());
+
+        if (!hasScores) {
+            // No scores yet - show teams awaiting scores
+            const tbody = document.getElementById('leaderboard-body');
+            let html = '';
+            rows.forEach((row, i) => {
+                html += `<tr>
+                    <td class="rank-cell">-</td>
+                    <td class="team-cell">
+                        <div class="player-a">${row[1] || ''}</div>
+                        <div class="player-b">${row[2] || ''}</div>
+                    </td>
+                    <td class="hcp-cell">${row[3] || ''}</td>
+                    <td class="score-cell">-</td>
+                    <td class="score-cell">-</td>
+                    <td class="vs-par-cell vs-par-even">-</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+
+            // Show message
+            const existingMsg = document.getElementById('no-scores-msg');
+            if (!existingMsg) {
+                const msg = document.createElement('div');
+                msg.id = 'no-scores-msg';
+                msg.className = 'no-scores';
+                msg.innerHTML = '<div class="emoji">&#9971;</div><div>Scores will appear here as they\'re entered</div>';
+                document.getElementById('leaderboard-table').parentNode.insertBefore(msg, document.getElementById('leaderboard-table'));
+            }
+        } else {
+            // Remove no scores message if it exists
+            const msg = document.getElementById('no-scores-msg');
+            if (msg) msg.remove();
+
+            // Sort by rank
+            rows.sort((a, b) => {
+                const rankA = parseInt(a[7]) || 999;
+                const rankB = parseInt(b[7]) || 999;
+                return rankA - rankB;
+            });
+
+            const tbody = document.getElementById('leaderboard-body');
+            let html = '';
+            rows.forEach((row, i) => {
+                const rank = row[7] || '-';
+                const vsPar = formatVsPar(row[6]);
+                const isLeader = (rank === '1' || rank === 1);
+                html += `<tr class="${isLeader ? 'leader' : ''}">
+                    <td class="rank-cell ${getRankClass(rank)}">${rank}</td>
+                    <td class="team-cell">
+                        <div class="player-a">${row[1] || ''}</div>
+                        <div class="player-b">${row[2] || ''}</div>
+                    </td>
+                    <td class="hcp-cell">${row[3] || ''}</td>
+                    <td class="score-cell">${row[4] || '-'}</td>
+                    <td class="score-cell">${row[5] || '-'}</td>
+                    <td class="vs-par-cell ${vsPar.className}">${vsPar.text}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        document.getElementById('leaderboard-loading').style.display = 'none';
+        document.getElementById('leaderboard-table').style.display = 'table';
+    }
+
+    function renderTeams(data) {
+        const rows = data.slice(5).filter(r => r.length > 1 && r[1] && r[1].trim());
+        const tbody = document.getElementById('teams-body');
+        let html = '';
+        rows.forEach(row => {
+            html += `<tr>
+                <td style="text-align:center; font-weight:600;">${row[0] || ''}</td>
+                <td>${row[1] || ''} <span style="color:#888; font-size:12px;">(${row[2] || ''})</span></td>
+                <td>${row[3] || ''} <span style="color:#888; font-size:12px;">(${row[4] || ''})</span></td>
+                <td style="text-align:center;">${row[5] || ''}</td>
+                <td style="text-align:center;">${row[6] || ''}</td>
+                <td style="text-align:center; font-weight:600; color:#4CAF50;">${row[7] || ''}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('teams-loading').style.display = 'none';
+        document.getElementById('teams-table').style.display = 'table';
+    }
+
+    function renderPlayers(data) {
+        const rows = data.slice(5).filter(r => r.length > 1 && r[1] && r[1].trim());
+        const tbody = document.getElementById('players-body');
+        let html = '';
+        rows.forEach(row => {
+            html += `<tr>
+                <td style="text-align:center;">${row[0] || ''}</td>
+                <td style="font-weight:500;">${row[1] || ''}</td>
+                <td style="text-align:center;">${row[2] || ''}</td>
+                <td style="text-align:center;">${row[3] || ''}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('players-loading').style.display = 'none';
+        document.getElementById('players-table').style.display = 'table';
+    }
+
+    // Initial load
+    fetchData();
+
+    // Auto-refresh
+    setInterval(fetchData, REFRESH_INTERVAL);
+</script>
+
+</body>
+</html>
