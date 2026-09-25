@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f1512">
-    <title>The Cunti Cup</title>
+    <title>2nd Annual Cuntini Cup</title>
     <style>
         :root {
             --bg: #0f1512;
@@ -35,38 +35,72 @@
 
         .wrap { max-width: 720px; margin: 0 auto; }
 
-        /* ---------- Header ---------- */
-        .hero img { width: 100%; display: block; }
-
-        .masthead {
-            padding: 28px 18px 20px;
-            text-align: center;
-            background:
-                radial-gradient(120% 90% at 50% 0%, rgba(76,175,80,0.22) 0%, rgba(76,175,80,0) 60%),
-                var(--bg);
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
             border-bottom: 1px solid var(--line);
         }
-        .masthead .kicker {
-            color: var(--green);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 72% 42%;
+            opacity: 0.5;
+            filter: grayscale(1) contrast(1.05);
         }
-        .masthead h1 {
-            font-size: 26px;
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(15,21,18,0.97) 0%, rgba(15,21,18,0.86) 40%, rgba(15,21,18,0.45) 72%, rgba(15,21,18,0.10) 100%),
+                linear-gradient(180deg, rgba(15,21,18,0.00) 0%, rgba(15,21,18,0.35) 65%, rgba(15,21,18,0.97) 100%);
+        }
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 22px 18px 20px;
+        }
+        .hero-cup {
+            flex: none;
+            width: 116px;
+            height: 116px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 0 3px rgba(240, 195, 79, 0.6), 0 12px 32px rgba(0, 0, 0, 0.55);
+            background: #1e2723;
+        }
+        .hero-text { min-width: 0; }
+        .hero .kicker {
+            color: var(--gold);
+            font-size: 10.5px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .hero h1 {
+            font-size: 27px;
             font-weight: 800;
             letter-spacing: -0.3px;
-            line-height: 1.15;
+            line-height: 1.1;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
-        .masthead .sub {
-            margin-top: 8px;
+        .hero .sub {
+            margin-top: 9px;
             color: var(--muted);
-            font-size: 13.5px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
         }
-        .masthead .sub span + span::before { content: "  •  "; color: var(--dim); }
+        .hero .sub span + span::before { content: "  •  "; color: var(--dim); }
 
         /* ---------- Notice ---------- */
         .notice {
@@ -304,9 +338,7 @@
         }
         .fetch-fail.show { display: block; }
 
-        /* ---------- Banner + footer ---------- */
-        .banner { display: none; }
-        .banner img { width: 100%; display: block; }
+        /* ---------- Footer ---------- */
         .footer {
             padding: 18px 16px 28px;
             text-align: center;
@@ -326,7 +358,9 @@
             .net-cell { font-size: 15px; }
             .rank-cell { width: 36px; font-size: 14px; }
             .nav-tabs button { font-size: 12px; padding: 10px 2px; }
-            .masthead h1 { font-size: 23px; }
+            .hero h1 { font-size: 23px; }
+            .hero-cup { width: 96px; height: 96px; }
+            .hero-inner { gap: 13px; padding: 18px 14px 16px; }
         }
         @media (max-width: 340px) {
             .info-grid { grid-template-columns: 1fr; }
@@ -336,14 +370,17 @@
 <body>
 <div class="wrap">
 
-    <!-- Hero image (optional). Set HERO_IMAGE below to use a banner image instead of the text masthead. -->
-    <div class="hero" id="hero" style="display:none;"><img id="hero-img" alt=""></div>
-
-    <!-- Text masthead (event/date/venue come from the Details tab, with fallbacks) -->
-    <header class="masthead" id="masthead">
-        <div class="kicker" id="event-kicker">2-Man Scramble</div>
-        <h1 id="event-name">The Cunti Cup</h1>
-        <div class="sub" id="event-sub"></div>
+    <!-- Hero: the Admiral (background) and the cup, with the event name from the Details tab -->
+    <header class="hero" id="hero">
+        <img class="hero-bg" src="assets/admiral/image.png" alt="" aria-hidden="true">
+        <div class="hero-inner">
+            <img class="hero-cup" src="assets/cup/image.png" alt="The Cuntini Cup trophy">
+            <div class="hero-text">
+                <div class="kicker">The Admiral Sports Bar &amp; Kitchen presents</div>
+                <h1 id="event-name">2nd Annual Cuntini Cup</h1>
+                <div class="sub" id="event-sub"></div>
+            </div>
+        </div>
     </header>
 
     <!-- Notice from the organizer (Details tab, "Notice" row). Hidden when empty. -->
@@ -438,11 +475,8 @@
         <div class="calc-list" id="calc-list"></div>
     </section>
 
-    <!-- Optional banner image (set BANNER_IMAGE below) -->
-    <div class="banner" id="banner"><img id="banner-img" alt=""></div>
-
     <footer class="footer">
-        <div id="footer-name">The Cunti Cup</div>
+        <div id="footer-name">2nd Annual Cuntini Cup</div>
         <div id="footer-venue" style="margin-top:4px;"></div>
     </footer>
 </div>
@@ -455,12 +489,8 @@
     const SHEET_ID = '1kM2RLB_gEbbARUsajtyI7tCgVbE-PxPfxkyBo0oCwq8';
     const REFRESH_INTERVAL = 20000; // ms
 
-    // Optional images (Google Drive file: https://lh3.googleusercontent.com/d/FILE_ID). Leave '' to hide.
-    const HERO_IMAGE = '';
-    const BANNER_IMAGE = '';
-
     // Fallbacks used only when the Details tab has no Event / Date / Venue rows.
-    const FALLBACK = { event: 'The Cunti Cup', date: 'Saturday 26 September 2026', venue: 'El Camaleón at Mayakoba' };
+    const FALLBACK = { event: '2nd Annual Cuntini Cup', date: 'Saturday 26 September 2026', venue: 'El Camaleón at Mayakoba', format: '2-Man Scramble' };
 
     // Sheet layout contract. Data rows start at index 5 on Players / Teams / Leader Board.
     const DATA_START = 5;
@@ -575,17 +605,17 @@
             if (RESERVED[key]) { kv[key] = v; if (key !== 'format') return; }
             if (v) grid.push({ k, v });
         });
-        if (kv.format) $('event-kicker').textContent = kv.format;
 
         const eventName = kv.event || FALLBACK.event;
         const date = kv.date || FALLBACK.date;
         const venue = kv.venue || FALLBACK.venue;
+        const format = kv.format || FALLBACK.format;
 
         $('event-name').textContent = eventName;
         $('footer-name').textContent = eventName;
         $('footer-venue').textContent = [venue, date].filter(Boolean).join(' • ');
         document.title = eventName;
-        const sub = [venue, date].filter(Boolean).map(s => `<span>${esc(s)}</span>`).join('');
+        const sub = [format, venue, date].filter(Boolean).map(s => `<span>${esc(s)}</span>`).join('');
         $('event-sub').innerHTML = sub;
         $('event-sub').style.display = sub ? '' : 'none';
 
@@ -730,12 +760,6 @@
             </div>`;
         }).join('');
     }
-
-    // ------------------------------------------------------------------
-    // Images
-    // ------------------------------------------------------------------
-    if (HERO_IMAGE) { $('hero-img').src = HERO_IMAGE; $('hero').style.display = ''; $('masthead').style.display = 'none'; }
-    if (BANNER_IMAGE) { $('banner-img').src = BANNER_IMAGE; $('banner').style.display = 'block'; }
 
     // ------------------------------------------------------------------
     // Go
