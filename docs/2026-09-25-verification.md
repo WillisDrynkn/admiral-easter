@@ -47,9 +47,19 @@ Screenshots reviewed at 390 px and 360 px (leaderboard, teams, players, strokes,
 | Live page shows the submission | Chrome, within one refresh | ✅ |
 | Test data removed | Deleted Scores rows 2–3; read back: header only, leaderboard empty, Rules default, Notice blank | ✅ |
 
+## Hero design and event name (same day, evening)
+
+| Check | Method | Result |
+|---|---|---|
+| Event name | The cup artwork supplied by the owner reads "2ND ANNUAL CUNTINI CUP"; adopted as the event name in `index.html` (title, fallback), README, the form title, the form builder and the sheet (`Details!Event`, tab banners) | ✅ consistent everywhere; Willis asked to confirm the spelling |
+| Hero images | Owner's Admiral photo and cup artwork committed as `assets/admiral/image.png` and `assets/cup/image.png` (uploaded through GitHub's file uploader, which fixes the filename); page references them by relative path, so the page itself stays ~32 KB | ✅ |
+| Hero layout | Cup as a round badge, "The Admiral Sports Bar & Kitchen presents" kicker, event name, sub line `Format • Venue • Date`; Admiral photo faded and desaturated behind two gradients so the text stays readable | ✅ fixture tests updated (`#event-sub` carries the format; images served with the right content type) |
+| Live after the change | Chrome, hard reload (`?v=3`): both images load, sub line "2-Man Scramble • El Camaleón at Mayakoba • Saturday 26 September 2026", console clean | ✅ |
+| Form title | Renamed to "Cuntini Cup - Score Entry" in the form editor (ASCII hyphen: the editor garbled an em dash); public form page re-checked | ✅ |
+
 ## Still open
 
 | Item | Notes |
 |---|---|
-| Hero / banner images | Optional. Text header is live. |
-| `docs/` and `tests/` on GitHub | Committed here; being added through the web editor. |
+| Nothing blocking the event | Sheet, page, form and hero are all live and tested. |
+| Roster changes | If a team changes after today, edit `Players` and run `refreshTeamDropdown()` (README). |
