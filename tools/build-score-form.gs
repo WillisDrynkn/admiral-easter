@@ -136,7 +136,10 @@ function buildScoreForm() {
   const grossFormulas = [];
   for (let r = CONFIG.leaderboardFirstRow; r <= CONFIG.leaderboardLastRow; r++) {
     const team = '$' + CONFIG.leaderboardTeamCol + r;
-    grossFormulas.push(['=IFERROR(VALUE(ARRAYFORMULA(LOOKUP(2,1/((IFERROR(VALUE(REGEXEXTRACT(' + R + '!$' + teamCol + '$2:$' + teamCol + ',"^\\d+")),0)=' + team + ')*(' + R + '!$' + grossCol + '$2:$' + grossCol + '<>"")),' + R + '!$' + grossCol + '$2:$' + grossCol + '))),"")']);
+    // Whole-column references on purpose: Google Forms INSERTS response rows, which would push a $C$2:$C
+    // reference down to $C$3:$C and silently drop new submissions. Column references never shift; the
+    // ROW()>1 test keeps the header row out.
+    grossFormulas.push(['=IFERROR(VALUE(ARRAYFORMULA(LOOKUP(2,1/((ROW(' + R + '!$' + teamCol + ':$' + teamCol + ')>1)*(IFERROR(VALUE(REGEXEXTRACT(' + R + '!$' + teamCol + ':$' + teamCol + ',"^\\d+")),0)=' + team + ')*(' + R + '!$' + grossCol + ':$' + grossCol + '<>"")),' + R + '!$' + grossCol + ':$' + grossCol + '))),"")']);
   }
   lb.getRange(CONFIG.leaderboardGrossCol + CONFIG.leaderboardFirstRow + ':' + CONFIG.leaderboardGrossCol + CONFIG.leaderboardLastRow)
     .setFormulas(grossFormulas);
@@ -145,8 +148,8 @@ function buildScoreForm() {
   const details = ss.getSheetByName(CONFIG.detailsSheet);
   if (!details) throw new Error('Sheet "' + CONFIG.detailsSheet + '" not found.');
   const latestFormula = (column, fallback) =>
-    '=IFERROR(REGEXREPLACE(TO_TEXT(ARRAYFORMULA(LOOKUP(2,1/(TRIM(' + R + '!$' + column + '$2:$' + column + ')<>""),' +
-    R + '!$' + column + '$2:$' + column + '))),"^\\s*-\\s*$",""),"' + String(fallback).replace(/"/g, '""') + '")';
+    '=IFERROR(REGEXREPLACE(TO_TEXT(ARRAYFORMULA(LOOKUP(2,1/((ROW(' + R + '!$' + column + ':$' + column + ')>1)*(TRIM(' + R + '!$' + column + ':$' + column + ')<>"")),' +
+    R + '!$' + column + ':$' + column + '))),"^\\s*-\\s*$",""),"' + String(fallback).replace(/"/g, '""') + '")';
   const detailsRow = label => {
     const labels = details.getRange('A1:A50').getValues().map(r => String(r[0]).trim());
     let row = labels.indexOf(label) + 1;
