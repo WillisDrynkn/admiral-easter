@@ -1,5 +1,5 @@
 /**
- * Cunti Cup scoreboard — one-time builder for the organizer's score-entry Google Form.
+ * Cuntini Cup scoreboard — one-time builder for the organizer's score-entry Google Form.
  *
  * HOW TO RUN (once):
  *   1. Open the scoreboard spreadsheet → Extensions → Apps Script.
@@ -21,7 +21,7 @@
  */
 
 const CONFIG = {
-  formTitle: 'Cunti Cup — Score Entry',
+  formTitle: 'Cuntini Cup — Score Entry',
   formDescription: 'Enter a team\'s gross score, or post a notice to the board. ' +
                    'To correct a score, just submit that team again — the latest entry wins.',
   teamsSheet: 'Teams',
