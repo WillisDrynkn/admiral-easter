@@ -37,7 +37,7 @@ Screenshots reviewed at 390 px and 360 px (leaderboard, teams, players, strokes,
 
 | Check | Method | Result |
 |---|---|---|
-| Deployed to GitHub Pages | Committed `index.html`, README, `tools/build-score-form.gs` through the GitHub web editor in Willis's Chrome (the session's git proxy could not push to this repo) | ✅ live at https://willisdrynkn.github.io/admiral-easter/ |
+| Deployed to GitHub Pages | Committed `index.html`, README, `tools/build-score-form.gs` through the GitHub web editor in Willis's Chrome (the session's git proxy could not push to this repo) | ✅ live at https://willisdrynkn.github.io/admiral-easter/ (renamed to `/cuntini-cup/` later that night) |
 | Live page in a real browser | Chrome: header "The Cunti Cup · El Camaleón at Mayakoba · Saturday 26 September 2026", 10 teams, strokes column, Strokes tab working; console clean (only an unrelated extension error) | ✅ |
 | Event details, name fixes | Details rows Event/Date/Venue; Players: Nick D'Urso, Michael Bukati; banners on the three tabs | ✅ Date stored as text, not a date serial |
 | Form built and linked | `buildScoreForm()` run from the sheet's Apps Script editor; `Scores` tab created (moved to the end); links written to `Details!D1:E3` | ✅ |
@@ -57,9 +57,33 @@ Screenshots reviewed at 390 px and 360 px (leaderboard, teams, players, strokes,
 | Live after the change | Chrome, hard reload (`?v=3`): both images load, sub line "2-Man Scramble • El Camaleón at Mayakoba • Saturday 26 September 2026", console clean | ✅ |
 | Form title | Renamed to "Cuntini Cup - Score Entry" in the form editor (ASCII hyphen: the editor garbled an em dash); public form page re-checked | ✅ |
 
+## Admin page replaces the form (same day, night)
+
+Willis's verdict on the form: unusable — the organizer will not go in and out of a form for every score; he needs one screen with all the teams that he can come back to. Built `admin.html` + `tools/admin-api.gs` instead.
+
+| Check | Method | Result |
+|---|---|---|
+| Fixture tests for the admin page | `tests/test_admin.js`, headless Chromium, API mocked with the script's validation rules — **44 checks, all passing**: prefilled scores/lines, strokes/net/rank shown, 49/121/letters rejected client-side, only changed fields sent, clearing a score called out, server rejection keeps the edits, network failure then retry, reload guard, wrong key, missing key, non-JSON answer, 390 px and 360 px, no console errors | ✅ |
+| `setupAdmin()` migration | Run once in Willis's Apps Script project: key generated, old form unlinked, `Scores` tab deleted, `Leader Board!E6:E15` and `Details` Rules/Notice turned into plain values, `D1:E3` cleared, `Log` tab created | ✅ (the form-closing step threw `Invalid data updating form`; closed afterwards with `closeOldForm()` — verified closed) |
+| Web app deployed | v1, execute as Willis, access Anyone; `/exec` URL baked into `admin.html` | ✅ GET with the key returns the ten teams and lines; wrong key → "This link is not valid" |
+| Cross-origin from GitHub Pages | `fetch` GET and POST from the `willisdrynkn.github.io` origin (text/plain body, redirect followed) | ✅ both return JSON; no CORS error |
+| Live end-to-end, real sheet | Admin page on the live site: T3 = 66, T9 = 70, Notice set → Save | ✅ sheet: T3 66/65/−7/rank 1, T9 70/69/−3/rank 2, Notice text; `Log` has three rows; public board showed both rows and the banner within one refresh |
+| Reopen shows current state | Reloaded the admin page | ✅ 66 and 70 prefilled, Notice prefilled, T3 shows "Net 65 · 1st" |
+| Correction, clear, notice off | T3 → 64, T9 box emptied ("Score will be removed on Save" shown), Notice emptied → Save | ✅ board: only T3 (64/63/−9), banner gone; `Log` rows for each |
+| Test data removed | T3 box emptied → Save | ✅ board empty, `Details!Notice` blank, 8 `Log` rows record the whole rehearsal |
+| Secrets | `grep` for the key across the repo; `Details!D1:E3` cleared | ✅ key exists only in Script Properties and in the organizer's link |
+| Repo renamed | GitHub Settings → `cuntini-cup`; Sheets API key confirmed unrestricted by referrer beforehand (worked from `script.google.com`) | ✅ see below |
+
+## Repo rename to `cuntini-cup`
+
+| Check | Method | Result |
+|---|---|---|
+| New Pages address serves the board and the admin page | Loaded `https://willisdrynkn.github.io/cuntini-cup/` and `/admin.html?k=…` in Chrome after the rename | ✅ board: 10 rows, both hero images load, live status; admin page: 10 rows loaded with the key, cup badge loads, its board link points at the new address |
+| Old address | `https://willisdrynkn.github.io/admiral-easter/` | ✅ confirmed: now "Site not found". GitHub redirects the repo URL but not Pages. Nobody had the old link except Willis. |
+
 ## Still open
 
 | Item | Notes |
 |---|---|
-| Nothing blocking the event | Sheet, page, form and hero are all live and tested. |
-| Roster changes | If a team changes after today, edit `Players` and run `refreshTeamDropdown()` (README). |
+| Nothing blocking the event | Sheet, board, admin page and hero are all live and tested; the key is with Willis. |
+| Roster changes | If a team changes after today, edit `Players`; the board and the admin page follow. |
