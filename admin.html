@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1512">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Cuntini Cup — Organizer</title>
+    <style>
+        :root {
+            --bg: #0f1512;
+            --bg-2: #161d19;
+            --bg-3: #1e2723;
+            --line: #2a3530;
+            --text: #f2f5f3;
+            --muted: #98a59e;
+            --dim: #6b776f;
+            --green: #4CAF50;
+            --green-soft: rgba(76, 175, 80, 0.14);
+            --gold: #f0c34f;
+            --red: #ff7b72;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.35;
+            padding-bottom: 110px;   /* room for the sticky save bar */
+        }
+        .wrap { max-width: 640px; margin: 0 auto; }
+
+        /* ---------- Header ---------- */
+        .top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 16px 14px;
+            border-bottom: 1px solid var(--line);
+            background: var(--bg-2);
+        }
+        .top img {
+            flex: none;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 0 2px rgba(240, 195, 79, 0.6);
+            background: var(--bg-3);
+        }
+        .top .kicker {
+            color: var(--gold);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .top h1 { font-size: 20px; font-weight: 800; line-height: 1.15; }
+        .top .sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+        .top .sub a { color: var(--green); font-weight: 700; text-decoration: none; }
+
+        /* ---------- Sections ---------- */
+        section { padding: 16px 14px 4px; }
+        h2 {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .hint { color: var(--dim); font-size: 12.5px; margin-bottom: 10px; }
+
+        /* ---------- Team rows ---------- */
+        .card { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 10px 10px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .row:last-child { border-bottom: none; }
+        .row .who { flex: 1; min-width: 0; }
+        .row .tn { color: var(--dim); font-size: 10.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; }
+        .row .names { font-weight: 700; font-size: 14.5px; line-height: 1.25; overflow-wrap: anywhere; }
+        .row .meta { color: var(--muted); font-size: 12px; margin-top: 3px; font-variant-numeric: tabular-nums; }
+        .row .meta b { color: var(--text); font-weight: 700; }
+        .row .meta .clear-note { color: var(--gold); font-weight: 700; }
+        .row input {
+            flex: none;
+            width: 92px;
+            height: 54px;
+            border-radius: 10px;
+            border: 1.5px solid var(--line);
+            background: var(--bg);
+            color: var(--text);
+            font: inherit;
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            -moz-appearance: textfield;
+        }
+        .row input::-webkit-outer-spin-button, .row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .row input::placeholder { color: var(--dim); font-weight: 600; font-size: 15px; }
+        .row input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+        .row.dirty input { border-color: var(--gold); }
+        .row.invalid input { border-color: var(--red); background: rgba(255, 123, 114, 0.08); }
+        .row .err { color: var(--red); font-size: 12px; font-weight: 700; margin-top: 3px; }
+
+        /* ---------- Lines ---------- */
+        .field { margin-bottom: 12px; }
+        .field label { display: block; font-weight: 700; font-size: 13.5px; margin-bottom: 4px; }
+        .field .note { color: var(--dim); font-size: 12px; margin-bottom: 6px; }
+        .field textarea {
+            display: block;
+            width: 100%;
+            min-height: 54px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1.5px solid var(--line);
+            background: var(--bg-2);
+            color: var(--text);
+            font: inherit;
+            font-size: 16px;   /* 16px stops iOS zooming in */
+            line-height: 1.4;
+            resize: none;
+            overflow: hidden;
+        }
+        .field textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+        .field.dirty textarea { border-color: var(--gold); }
+        .field .count { text-align: right; color: var(--dim); font-size: 11px; margin-top: 3px; }
+        .field .count.over { color: var(--red); font-weight: 700; }
+
+        /* ---------- Save bar ---------- */
+        .savebar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+            background: rgba(15, 21, 18, 0.94);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid var(--line);
+            z-index: 10;
+        }
+        .savebar .inner { max-width: 640px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+        .savebar .status { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); line-height: 1.3; }
+        .savebar .status.ok { color: var(--green); font-weight: 700; }
+        .savebar .status.err { color: var(--red); font-weight: 700; }
+        .savebar .status.pending { color: var(--gold); font-weight: 700; }
+        button.save {
+            flex: none;
+            min-width: 128px;
+            height: 54px;
+            padding: 0 22px;
+            border: none;
+            border-radius: 12px;
+            background: var(--green);
+            color: #0b1a0e;
+            font: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(76, 175, 80, 0.25);
+        }
+        button.save:disabled { background: var(--bg-3); color: var(--dim); box-shadow: none; cursor: default; }
+        button.reload {
+            flex: none;
+            width: 54px; height: 54px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: var(--bg-2);
+            color: var(--muted);
+            font-size: 22px;
+            cursor: pointer;
+        }
+        button.reload:disabled { opacity: 0.4; cursor: default; }
+
+        /* ---------- States ---------- */
+        .loading { text-align: center; padding: 48px 16px; color: var(--muted); }
+        .spinner {
+            display: inline-block;
+            width: 22px; height: 22px;
+            border: 3px solid var(--line);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .banner {
+            display: none;
+            margin: 14px 14px 0;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .banner.show { display: block; }
+        .banner.error { background: rgba(255, 123, 114, 0.1); border: 1px solid rgba(255, 123, 114, 0.4); color: #ffd2ce; }
+        .banner.warn { background: rgba(240, 195, 79, 0.12); border: 1px solid rgba(240, 195, 79, 0.4); color: #fbe7b0; }
+        .banner b { font-weight: 800; }
+        .footer { padding: 18px 16px 10px; text-align: center; font-size: 12px; color: var(--dim); }
+
+        @media (max-width: 360px) {
+            .row { gap: 8px; padding-left: 12px; }
+            .row input { width: 84px; }
+            .row .names { font-size: 13.5px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <header class="top">
+        <img src="assets/cup/image.png" alt="">
+        <div>
+            <div class="kicker">Organizer</div>
+            <h1 id="event-name">Cuntini Cup</h1>
+            <div class="sub" id="event-sub">Scores &amp; board text · <a id="board-link" href="./" target="_blank" rel="noopener">open the live board</a></div>
+        </div>
+    </header>
+
+    <div class="banner" id="banner" role="alert"></div>
+
+    <div class="loading" id="loading"><div class="spinner"></div><div>Loading the sheet…</div></div>
+
+    <main id="main" hidden>
+        <section>
+            <h2>Team scores</h2>
+            <div class="hint">Type each team's gross score for 18 holes, then tap <b>Save</b>. Leave a box empty for a team that hasn't finished. Clearing a box removes that team's score.</div>
+            <div class="card" id="teams"></div>
+        </section>
+
+        <section>
+            <h2>Board text</h2>
+            <div class="hint">These four lines show on the live board. Change any of them and tap <b>Save</b>.</div>
+            <div id="lines"></div>
+        </section>
+
+        <div class="footer">Changes go straight into the scoreboard sheet. The board updates within 20 seconds. Every save is logged.</div>
+    </main>
+
+    <div class="savebar" id="savebar" hidden>
+        <div class="inner">
+            <div class="status" id="status">Loaded</div>
+            <button class="reload" id="reload" type="button" title="Reload from the sheet" aria-label="Reload from the sheet">&#8635;</button>
+            <button class="save" id="save" type="button" disabled>Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------------------------------- config
+    // Web app URL of tools/admin-api.gs (Deploy → Web app → …/exec). The key is NOT here: it travels in the
+    // organizer's link (admin.html?k=…) and is checked by the script on every request.
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz_zU2ZeI_wKkL_ldNW2RX2XhUN7YybA6eTeeuXGiHxYGTA_5_9F-6VxdapJbGG4lYQDg/exec';
+
+    const LINE_LABELS = {
+        Format:   { title: 'Format',   note: 'Shown in the details box, e.g. "2-Man Scramble".' },
+        Handicap: { title: 'Handicap', note: 'The handicap rule in words. (The maths itself lives in the sheet.)' },
+        Rules:    { title: 'Rules',    note: 'The rules line in the details box.' },
+        Notice:   { title: 'Notice',   note: 'A message at the very top of the board, e.g. "Prizes at the bar at 3pm". Leave empty for no notice.' },
+    };
+
+    // ---------------------------------------------------------------- state
+    const KEY = (() => {
+        const p = new URLSearchParams(location.search);
+        return (p.get('k') || (location.hash.match(/k=([^&]+)/) || [])[1] || '').trim();
+    })();
+    let state = null;          // last state from the server
+    let busy = false;
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmtTime = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // ---------------------------------------------------------------- api
+    async function apiGet() {
+        const r = await fetch(API_URL + (API_URL.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(KEY), { method: 'GET', redirect: 'follow', cache: 'no-store' });
+        return parseResponse(r);
+    }
+    async function apiPost(payload) {
+        // text/plain keeps the request "simple" (no CORS preflight); Apps Script cannot answer OPTIONS.
+        const r = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ k: KEY }, payload)) });
+        return parseResponse(r);
+    }
+    async function parseResponse(r) {
+        const text = await r.text();
+        let data;
+        try { data = JSON.parse(text); } catch (e) { throw new Error('The sheet did not answer properly (HTTP ' + r.status + ').'); }
+        if (!data || data.ok !== true) throw new Error((data && data.error) || 'Unknown error from the sheet.');
+        return data;
+    }
+
+    // ---------------------------------------------------------------- render
+    function render() {
+        const info = state.info || {};
+        if (info.Event) { $('event-name').textContent = info.Event; document.title = info.Event + ' — Organizer'; }
+
+        const teams = $('teams');
+        teams.innerHTML = '';
+        state.teams.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.dataset.team = t.team;
+            const names = [t.a, t.b].filter(Boolean).join(' & ') || '—';
+            row.innerHTML =
+                '<div class="who">' +
+                    '<div class="tn">Team ' + esc(t.team) + '</div>' +
+                    '<div class="names">' + esc(names) + '</div>' +
+                    '<div class="meta"></div>' +
+                    '<div class="err" hidden></div>' +
+                '</div>' +
+                '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" placeholder="gross" aria-label="Gross score, team ' + esc(t.team) + '">';
+            const input = row.querySelector('input');
+            input.value = t.gross == null ? '' : String(t.gross);
+            input.dataset.orig = input.value;
+            input.addEventListener('input', () => { input.value = input.value.replace(/[^0-9]/g, ''); updateRow(row, t); updateSaveBar(); });
+            input.addEventListener('focus', () => input.select());
+            teams.appendChild(row);
+            updateRow(row, t);
+        });
+
+        const lines = $('lines');
+        lines.innerHTML = '';
+        (state.editable || Object.keys(LINE_LABELS)).forEach(label => {
+            const meta = LINE_LABELS[label] || { title: label, note: '' };
+            const f = document.createElement('div');
+            f.className = 'field';
+            f.dataset.label = label;
+            f.innerHTML =
+                '<label for="line-' + esc(label) + '">' + esc(meta.title) + '</label>' +
+                (meta.note ? '<div class="note">' + esc(meta.note) + '</div>' : '') +
+                '<textarea id="line-' + esc(label) + '" rows="1" maxlength="' + (state.lineMaxLength || 300) + '"></textarea>' +
+                '<div class="count"></div>';
+            const ta = f.querySelector('textarea');
+            ta.value = state.lines[label] || '';
+            ta.dataset.orig = ta.value;
+            ta.addEventListener('input', () => { autosize(ta); updateField(f); updateSaveBar(); });
+            lines.appendChild(f);
+            updateField(f);
+        });
+        requestAnimationFrame(() => document.querySelectorAll('textarea').forEach(autosize));
+
+        $('loading').hidden = true;
+        $('main').hidden = false;
+        $('savebar').hidden = false;
+    }
+
+    function autosize(ta) { ta.style.height = 'auto'; ta.style.height = Math.max(54, ta.scrollHeight + 2) + 'px'; }
+
+    function updateRow(row, t) {
+        const input = row.querySelector('input');
+        const meta = row.querySelector('.meta');
+        const err = row.querySelector('.err');
+        const v = input.value.trim();
+        const orig = input.dataset.orig;
+        const dirty = v !== orig;
+        const problem = validateScore(v);
+        row.classList.toggle('dirty', dirty);
+        row.classList.toggle('invalid', !!problem);
+        err.hidden = !problem;
+        err.textContent = problem || '';
+
+        const bits = [];
+        bits.push('Strokes <b>' + (t.strokes == null ? '—' : esc(t.strokes)) + '</b>');
+        if (dirty && v === '' && orig !== '') {
+            bits.push('<span class="clear-note">Score will be removed on Save</span>');
+        } else if (dirty) {
+            bits.push('<span class="clear-note">Unsaved</span>');
+        } else if (t.gross != null && t.net != null) {
+            bits.push('Net <b>' + esc(t.net) + '</b>' + (t.rank != null ? ' · ' + ordinal(t.rank) : ''));
+        } else {
+            bits.push('No score yet');
+        }
+        meta.innerHTML = bits.join(' &nbsp;·&nbsp; ');
+    }
+
+    function updateField(f) {
+        const ta = f.querySelector('textarea');
+        const count = f.querySelector('.count');
+        const max = state.lineMaxLength || 300;
+        const dirty = ta.value.replace(/\s+/g, ' ').trim() !== ta.dataset.orig.replace(/\s+/g, ' ').trim();
+        f.classList.toggle('dirty', dirty);
+        count.textContent = ta.value.length > max * 0.8 ? ta.value.length + ' / ' + max : '';
+        count.classList.toggle('over', ta.value.length > max);
+    }
+
+    function validateScore(v) {
+        if (v === '') return '';
+        if (!/^\d{1,3}$/.test(v)) return 'Whole numbers only';
+        const n = Number(v), lo = state.scoreMin || 50, hi = state.scoreMax || 120;
+        if (n < lo || n > hi) return 'Must be between ' + lo + ' and ' + hi;
+        return '';
+    }
+
+    function ordinal(n) { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+
+    // ---------------------------------------------------------------- changes
+    function collectChanges() {
+        const scores = {}, lines = {};
+        let invalid = 0, removed = 0;
+        document.querySelectorAll('#teams .row').forEach(row => {
+            const input = row.querySelector('input');
+            const v = input.value.trim();
+            if (v === input.dataset.orig) return;
+            if (validateScore(v)) { invalid++; return; }
+            scores[row.dataset.team] = v === '' ? null : Number(v);
+            if (v === '') removed++;
+        });
+        document.querySelectorAll('#lines .field').forEach(f => {
+            const ta = f.querySelector('textarea');
+            const v = ta.value.replace(/\s+/g, ' ').trim();
+            if (v === ta.dataset.orig.replace(/\s+/g, ' ').trim()) return;
+            if (v.length > (state.lineMaxLength || 300)) { invalid++; return; }
+            lines[f.dataset.label] = v;
+        });
+        return { scores, lines, count: Object.keys(scores).length + Object.keys(lines).length, invalid, removed };
+    }
+
+    function updateSaveBar() {
+        if (!state || busy) return;
+        const ch = collectChanges();
+        const btn = $('save');
+        if (ch.invalid) {
+            setStatus('Fix the red box' + (ch.invalid > 1 ? 'es' : '') + ' first', 'err');
+            btn.disabled = true; btn.textContent = 'Save';
+        } else if (ch.count) {
+            setStatus(ch.count + ' unsaved change' + (ch.count > 1 ? 's' : '') + (ch.removed ? ' · ' + ch.removed + ' score' + (ch.removed > 1 ? 's' : '') + ' will be removed' : ''), 'pending');
+            btn.disabled = false; btn.textContent = 'Save ' + ch.count;
+        } else {
+            btn.disabled = true; btn.textContent = 'Save';
+            if (lastSaved) setStatus('Saved ' + fmtTime(lastSaved) + ' ✓', 'ok'); else setStatus('Nothing to save', '');
+        }
+    }
+
+    function setStatus(text, cls) { const s = $('status'); s.textContent = text; s.className = 'status' + (cls ? ' ' + cls : ''); }
+    function showBanner(html, cls) { const b = $('banner'); b.innerHTML = html; b.className = 'banner show ' + cls; }
+    function hideBanner() { $('banner').className = 'banner'; }
+
+    let lastSaved = null;
+
+    async function save() {
+        if (busy || !state) return;
+        const ch = collectChanges();
+        if (!ch.count || ch.invalid) { updateSaveBar(); return; }
+        busy = true;
+        hideBanner();
+        $('save').disabled = true; $('save').textContent = 'Saving…'; $('reload').disabled = true;
+        setStatus('Saving to the sheet…', 'pending');
+        try {
+            const data = await apiPost({ scores: ch.scores, lines: ch.lines });
+            state = data;
+            lastSaved = new Date();
+            render();
+            // Belt and braces: confirm every change we sent is what the sheet now holds.
+            const mismatches = verifyApplied(ch, data);
+            $('save').disabled = true; $('save').textContent = 'Save';
+            if (mismatches.length) {
+                showBanner('<b>Check the sheet:</b> the save went through but these did not come back as expected — ' + esc(mismatches.join('; ')), 'warn');
+                setStatus('Saved with warnings', 'err');
+            } else {
+                setStatus('Saved ' + fmtTime(lastSaved) + ' ✓ · ' + (data.changed || 0) + ' change' + (data.changed === 1 ? '' : 's') + ' written. The board updates within 20 s.', 'ok');
+            }
+        } catch (e) {
+            showBanner('<b>Not saved.</b> ' + esc(e.message) + ' Your changes are still on this page — check your signal and tap Save again.', 'error');
+            setStatus('Not saved', 'err');
+            $('save').disabled = false; $('save').textContent = 'Save ' + ch.count;
+        } finally {
+            busy = false;
+            $('reload').disabled = false;
+        }
+    }
+
+    function verifyApplied(ch, data) {
+        const out = [];
+        const byTeam = {};
+        (data.teams || []).forEach(t => { byTeam[String(t.team)] = t; });
+        Object.keys(ch.scores).forEach(team => {
+            const want = ch.scores[team], got = byTeam[team] ? byTeam[team].gross : undefined;
+            if ((want == null ? null : want) !== (got == null ? null : got)) out.push('Team ' + team + ' gross (sent ' + (want == null ? 'blank' : want) + ', sheet has ' + (got == null ? 'blank' : got) + ')');
+        });
+        Object.keys(ch.lines).forEach(label => {
+            const got = (data.lines || {})[label];
+            if (String(got == null ? '' : got).replace(/\s+/g, ' ').trim() !== ch.lines[label]) out.push(label + ' line');
+        });
+        return out;
+    }
+
+    async function load(initial) {
+        if (busy) return;
+        if (!initial) {
+            const ch = collectChanges();
+            if (ch.count && !confirmInline()) return;
+        }
+        busy = true;
+        hideBanner();
+        $('reload').disabled = true;
+        if (!initial) setStatus('Reloading…', 'pending');
+        try {
+            state = await apiGet();
+            render();
+            setStatus(initial ? 'Loaded ' + fmtTime(new Date()) : 'Reloaded ' + fmtTime(new Date()), '');
+        } catch (e) {
+            $('loading').hidden = true;
+            const msg = /not valid|organizer link|not set up/i.test(e.message)
+                ? '<b>This link isn\'t valid.</b> Ask Willis for the organizer link — it looks like admin.html?k=…'
+                : '<b>Couldn\'t load the sheet.</b> ' + esc(e.message) + ' Check your signal and reload.';
+            showBanner(msg, 'error');
+            if (!state) { $('savebar').hidden = false; $('save').disabled = true; setStatus('Not loaded', 'err'); }
+        } finally {
+            busy = false;
+            $('reload').disabled = false;
+        }
+    }
+
+    // Reload with unsaved edits: ask once, inline, without a native dialog.
+    let reloadArmed = false;
+    function confirmInline() {
+        if (reloadArmed) { reloadArmed = false; return true; }
+        reloadArmed = true;
+        setStatus('You have unsaved changes — tap ↻ again to throw them away', 'err');
+        setTimeout(() => { reloadArmed = false; updateSaveBar(); }, 6000);
+        return false;
+    }
+
+    // ---------------------------------------------------------------- boot
+    $('save').addEventListener('click', save);
+    $('reload').addEventListener('click', () => load(false));
+    window.addEventListener('beforeunload', e => { if (state && collectChanges().count) { e.preventDefault(); e.returnValue = ''; } });
+
+    if (!KEY) {
+        $('loading').hidden = true;
+        showBanner('<b>This page needs the organizer link.</b> Ask Willis for it — it looks like admin.html?k=…', 'error');
+    } else if (API_URL.indexOf('REPLACE') === 0) {
+        $('loading').hidden = true;
+        showBanner('<b>Not set up yet.</b> API_URL in admin.html still needs the web app address.', 'error');
+    } else {
+        load(true);
+    }
+</script>
+</body>
+</html>
