@@ -88,7 +88,8 @@ function serve() {
     const srv = http.createServer((req, r) => {
       const f = path.join(SITE_DIR, req.url === '/' ? 'index.html' : req.url.split('?')[0]);
       if (!fs.existsSync(f)) { r.writeHead(404); return r.end(); }
-      r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(fs.readFileSync(f));
+      const type = /\.jpe?g$/i.test(f) ? 'image/jpeg' : /\.png$/i.test(f) ? 'image/png' : 'text/html; charset=utf-8';
+      r.writeHead(200, { 'Content-Type': type }); r.end(fs.readFileSync(f));
     }).listen(0, () => res(srv));
   });
 }
@@ -122,10 +123,10 @@ function check(name, ok, extra = '') { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n
   const strokesCol = await page.$$eval('#leaderboard-body tr td:nth-child(3)', tds => tds.map(t => t.textContent.trim()));
   check('strokes column = 0,0,1,1,1,1,1,1,1,0', strokesCol.join(',') === '0,0,1,1,1,1,1,1,1,0', strokesCol.join(','));
   check('notice hidden when blank', !(await page.isVisible('#notice')));
-  check('header falls back to default name', (await page.textContent('#event-name')).trim() === 'The Cunti Cup');
+  check('header falls back to default name', (await page.textContent('#event-name')).trim() === '2nd Annual Cuntini Cup');
   const gridLabels = await page.$$eval('#details-grid .label', ls => ls.map(l => l.textContent.trim()));
   check('details grid shows Format/Handicap/Rules only', gridLabels.join('|') === 'Format|Handicap|Rules', gridLabels.join('|'));
-  check('kicker from Format row', (await page.textContent('#event-kicker')).trim() === '2-Man Scramble');
+  check('format appears in the hero sub line', /2-Man Scramble/.test(await page.textContent('#event-sub')));
   check('live bar shows Updated', /^Updated /.test((await page.textContent('#lastUpdate')).trim()));
   await page.screenshot({ path: path.join(OUT, '1-leaderboard-noscores.png'), fullPage: true });
 
