@@ -1,4 +1,4 @@
-# The Cunti Cup — live scoreboard
+# 2nd Annual Cuntini Cup — live scoreboard
 
 A single `index.html` hosted on GitHub Pages that reads a Google Sheet every 20 seconds. The sheet does the calculating; the page only displays. Scores go in through a Google Form on the organizer's phone.
 
@@ -32,7 +32,7 @@ Emergency overrides, in the sheet: type a number straight into `Leader Board!E<r
 - **Roster / handicaps:** edit the `Players` tab only (rows 6–25: name, team #, handicap, player 1 or 2). Teams, strokes and the leaderboard follow automatically.
 - **Team names changed?** Extensions → Apps Script → run `refreshTeamDropdown()` so the form's dropdown matches.
 - **Event name, date, venue:** rows `Event`, `Date`, `Venue` in the `Details` tab. They drive the page header, footer and browser title — no code change needed.
-- **Hero / banner images:** optional. Put the image in the Drive folder, then set `HERO_IMAGE` / `BANNER_IMAGE` in `index.html` to `https://lh3.googleusercontent.com/d/<FILE_ID>`.
+- **Hero images:** the Admiral photo behind the header is `assets/admiral/image.png`; the cup badge is `assets/cup/image.png`. To change one, replace the file under the same name (GitHub → the file → Upload files). No code change needed.
 - **Course par:** `Leader Board!K2`.
 - **A team withdraws:** strokes are measured from the lowest team handicap (`Teams!J4`). If you want everyone's strokes to stay as announced, type `8` (or whatever was announced) into `J4`.
 
