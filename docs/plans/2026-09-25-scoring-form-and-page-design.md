@@ -20,11 +20,12 @@ _Agreed with Willis, 25 Sep 2026. This is the brief the work was built from._
 | Strokes | Team handicap − lowest team handicap (`Teams!J4`, a `MIN` formula you can hard-code if a team withdraws). |
 | Net | Gross − Strokes. Ranking is identical to Gross − full Team Hcp; only the displayed number differs. |
 | Ties | Shared rank, shown as T1 / T3 on the page. No automatic countback. |
-| Score entry | One Google Form, organizer-only link. First tap: **A team score**, **A notice for the board** or **The rules line**. |
-| Corrections | Resubmit the team; the latest submission wins. Deleting a rogue row in `Scores` reverts to the previous one. Typing a number over `Leader Board!E` is the emergency override. |
-| Notice | Latest non-blank notice shows as a banner on the page. Submitting `-` clears it. |
-| Details from the form | Notices and the Rules line (latest wins, `-` clears; Rules falls back to the sheet's text). Format stays in the sheet. |
-| Page identity | Event / Date / Venue / Format come from `Details` rows (no redeploy to change them). Hero and banner images are optional constants in `index.html`. |
+| Score entry | ~~One Google Form~~ **Superseded the same evening:** an admin page (`admin.html?k=KEY`) showing every team with its current score and the four board lines, one Save. Willis: the organizer will not open and close a form ten times; he needs one screen he can come back to. |
+| Corrections | Change the number on the admin page and Save; clear the box to remove a score. Every change is one row in the `Log` tab (when, what, old, new). Typing a number over `Leader Board!E` is the emergency override; the admin page shows it on its next load. |
+| Notice | The Notice line shows as a banner on the page. Empty it on the admin page to take it down. |
+| Lines editable from the admin page | Format, Handicap (the wording only — the percentages stay in `Teams!F4:G4`), Rules, Notice. Event / Date / Venue stay in the sheet. |
+| Page identity | Event / Date / Venue / Format come from `Details` rows (no redeploy to change them). Hero images are repo files under `assets/`. |
+| Access to the admin page | A 12-character random key in the link, checked by the Apps Script on every request. Kept in Script Properties only — never in the repo, never in the sheet (the sheet is readable by anyone holding the public API key in `index.html`). `rotateAdminKey()` invalidates a leaked link. |
 
 ## Sheet layout (after this update)
 
@@ -34,31 +35,33 @@ _Agreed with Willis, 25 Sep 2026. This is the brief the work was built from._
 |---|---|---|---|---|---|---|---|---|---|
 | Team | Player A | Hcp A | Player B | Hcp B | Low × 35% | High × 15% | Team Hcp | Raw | Strokes |
 
-**Leader Board** rows 6–15: `A` Team, `B`/`C` names, `D` Team Hcp, `E` Gross (formula: latest form submission), `F` Net = E − I, `G` vs Par = F − `K2`, `H` Rank, `I` Strokes.
+**Leader Board** rows 6–15: `A` Team, `B`/`C` names, `D` Team Hcp, `E` Gross (plain value, written by the admin API), `F` Net = E − I, `G` vs Par = F − `K2`, `H` Rank, `I` Strokes.
 
-**Details**: `Format`, `Handicap`, `Rules`, `Notice` (formula), plus `Event`, `Date`, `Venue` when known. Rows whose key is Event/Date/Venue/Format/Notice are used by the header and banner; everything else renders in the details grid. Form links are written to `D1:E3`.
+**Details**: `Format`, `Handicap`, `Rules`, `Notice` (all plain text; the first four are what the admin page edits), plus `Event`, `Date`, `Venue`. Rows whose key is Event/Date/Venue/Format/Notice are used by the header and banner; everything else renders in the details grid. Nothing private is stored in this tab.
 
-**Scores** (created by the form builder): `Timestamp`, `What are you entering?`, `Team`, `Gross score (18 holes)`, `Notice`, `Rules`. Formulas that read it use whole-column references (`Scores!$C:$C`) with a `ROW()>1` guard, because Google Forms inserts rows and would otherwise push a `$C$2:$C` reference out from under new submissions.
+**Log** (created by `setupAdmin`): `When`, `Change`, `Old`, `New`, `Via` — appended by the admin API, one row per changed cell.
 
-## Form (built by `tools/build-score-form.gs`)
+## Admin page (`admin.html` + `tools/admin-api.gs`)
 
-- Page 1: *What are you entering?* → **A team score** / **A notice for the board** / **The rules line** (required, branches).
-- Score page: **Team** dropdown (`"3 — Ryan Vrba & El Tony"`, built from the Teams tab) + **Gross score (18 holes)** (whole number 50–120, regex-validated). Both required. Submits.
-- Notice page: **Notice** (required). Submits.
-- Rules page: **Rules** (required). Submits.
-- No sign-in, no email collection, unlimited responses, "submit another" link, confirmation *"Saved. The leaderboard updates within 20 seconds."*
-- Responses linked into the scoreboard sheet as tab `Scores`. The builder then writes the Gross, Notice and Rules formulas.
-- The team dropdown is static: run `refreshTeamDropdown()` after any roster change.
+- One screen: header, ten team rows (team number, both names, strokes, a big numeric box prefilled with the current gross, and Net · rank once scored), then Format / Handicap / Rules / Notice as text boxes, then a sticky bar with a Reload button and one **Save** button that shows how many changes are pending.
+- The page loads its state from the API on open and after every Save, so it always shows what is on the board. It never recomputes strokes or net — they come from the sheet.
+- Client-side rules mirror the script: whole number 50–120 or blank; lines up to 300 characters, whitespace collapsed. Invalid boxes go red and Save is disabled until fixed. Clearing a box that had a score is called out ("Score will be removed on Save").
+- Save sends only the fields that changed. The script validates everything first (unknown team, bad number, over-long line → the whole request is refused and nothing is written), takes a script lock, writes the changed cells, appends to `Log`, and returns the fresh state; the page compares what came back with what it sent and warns on any mismatch.
+- A failed Save (no signal, Google hiccup) leaves the edits on screen with a red message; Save again. Reload with unsaved edits asks first. Leaving the page with unsaved edits triggers the browser's warning.
+- Transport: `fetch` to the Apps Script `/exec` URL, `Content-Type: text/plain` so there is no CORS preflight (Apps Script cannot answer OPTIONS); the script replies with JSON through Google's redirect. Verified from the GitHub Pages origin.
+- The earlier Google Form (`tools/build-score-form.gs`) is closed and unlinked; its `Scores` tab was deleted by `setupAdmin`.
 
 ## Page
 
 - Tabs: Leaderboard · Teams · Players · **Strokes** (rule in plain words + per-team working, read from the sheet, never recomputed in JS).
 - Leaderboard columns: # · Team · Strokes · Gross · Net · vs Par. Tied ranks show as T1. Unscored teams sit at the bottom in team order.
 - Notice banner under the header when `Details!Notice` is non-empty.
+- Hero: the owner's Admiral photo faded behind the header, the cup artwork as a badge, event name from the sheet.
 - Hardening: all sheet strings HTML-escaped; ragged API rows tolerated; a failed refresh keeps the last good data and shows a red status instead of "Updating…" forever; refresh on tab focus.
 
 ## Known limits
 
-- Anyone holding the form link can post a score. Keep it off the page and off group chats.
+- Anyone holding the admin link (it contains the key) can change scores. Keep it off the board and off group chats; `rotateAdminKey()` if it gets out.
+- The admin API runs as Willis's Google account (Apps Script web app). A save takes 1–4 s while Google spins the script up.
 - The page trusts the sheet's row positions: never insert rows above row 6 on Players / Teams / Leader Board.
 - Handicaps should be whole numbers (one decimal is fine). The `Raw` column and Strokes tab show two decimals.
